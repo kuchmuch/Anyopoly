@@ -3,12 +3,13 @@ import { Space } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-export async function generateThemeSpaces(theme: string): Promise<{ spaces: Space[], playerNames: string[] }> {
+export async function generateThemeSpaces(theme: string): Promise<{ spaces: Space[], playerNames: string[], playerIcons: string[] }> {
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Generate a custom Monopoly board with 40 spaces based on the theme: "${theme}".
     
     Also generate 2 creative player titles/names that fit the theme perfectly (e.g., for Space: "Astronaut", "Alien").
+    Also generate 2 distinct emoji icons that match those player titles (e.g., "🧑‍🚀", "👽").
     
     The board must have exactly 40 spaces.
     The indices must match standard Monopoly:
@@ -42,6 +43,11 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
             items: { type: Type.STRING },
             description: "Array of 2 player titles/names fitting the theme"
           },
+          playerIcons: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Array of 2 distinct emoji icons fitting the player titles/names"
+          },
           spaces: {
             type: Type.ARRAY,
             items: {
@@ -66,7 +72,7 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
             }
           }
         },
-        required: ["playerNames", "spaces"]
+        required: ["playerNames", "playerIcons", "spaces"]
       }
     }
   });
@@ -75,6 +81,7 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
   const data = JSON.parse(jsonStr);
   const spaces: Space[] = data.spaces || [];
   const playerNames: string[] = data.playerNames || ["Player 1", "Player 2"];
+  const playerIcons: string[] = data.playerIcons || ["👤", "👤"];
   
   // Ensure exactly 40 spaces and correct IDs
   if (spaces.length !== 40) {
@@ -86,6 +93,7 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
       ...space,
       id: index // Enforce correct IDs
     })),
-    playerNames
+    playerNames,
+    playerIcons
   };
 }

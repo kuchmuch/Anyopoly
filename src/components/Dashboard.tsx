@@ -71,7 +71,7 @@ export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: Da
             className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md"
             style={{ backgroundColor: currentPlayer.color }}
           >
-            {currentPlayer.name.charAt(0)}
+            {currentPlayer.icon || currentPlayer.name.charAt(0)}
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-800">{currentPlayer.name}'s Turn</h3>
@@ -121,10 +121,13 @@ export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: Da
           {gameState.players.map(p => (
             <div key={p.id} className={`flex items-center justify-between p-3 rounded-lg border ${p.id === currentPlayer.id ? 'border-indigo-300 bg-indigo-50' : 'border-slate-200 bg-white'} ${p.bankrupt ? 'opacity-50 grayscale' : ''}`}>
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.color }} />
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-sm border border-white" style={{ backgroundColor: p.color }}>
+                  {p.icon || ''}
+                </div>
                 <span className="font-semibold text-slate-700">{p.name}</span>
                 {p.bankrupt && <span className="text-xs text-red-500 font-bold uppercase">Bankrupt</span>}
                 {p.inJail && <span className="text-xs text-orange-500 font-bold uppercase">In Jail</span>}
+                {p.getOutOfJailFreeCards ? <span className="text-xs text-emerald-600 font-bold bg-emerald-100 px-2 py-0.5 rounded-full" title="Get Out of Jail Free Cards">{p.getOutOfJailFreeCards} 🎟️</span> : null}
               </div>
               <span className="font-mono font-bold text-slate-900">${p.balance}M</span>
             </div>

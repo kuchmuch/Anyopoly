@@ -1,4 +1,4 @@
-import { Space } from './types';
+import { Space, Card } from './types';
 
 export const SPACES: Space[] = [
   { id: 0, name: 'Start Journey', type: 'go' },
@@ -43,41 +43,41 @@ export const SPACES: Space[] = [
   { id: 39, name: 'Northern Lights', type: 'property', color: '#00008B', price: 400, rent: [50, 200, 600, 1400, 1700, 2000], houseCost: 200 },
 ];
 
-export const CHANCE_CARDS = [
-  "Advance to Start Journey (Collect $200M)",
-  "Advance to Northern Lights",
-  "Advance to nearest Railroad. If unowned, you may buy it. If owned, pay owner twice the rental to which they are otherwise entitled.",
-  "Advance to nearest Railroad. If unowned, you may buy it. If owned, pay owner twice the rental to which they are otherwise entitled.",
-  "Advance to nearest Utility. If unowned, you may buy it. If owned, throw dice and pay owner a total ten times the amount thrown.",
-  "Bank pays you dividend of $50M",
-  "Get out of Nordic Prison Free",
-  "Go back 3 spaces",
-  "Go directly to Nordic Prison",
-  "Make general repairs on all your properties: For each house pay $25M, for each hotel pay $100M",
-  "Pay poor tax of $15M",
-  "Take a trip to DSB (Denmark). If you pass Start Journey, collect $200M",
-  "Take a walk to the Northern Lights. Advance token to Northern Lights.",
-  "You have been elected Chairman of the Nordic Council. Pay each player $50M",
-  "Your building loan matures. Receive $150M",
-  "You have won a cross-country skiing competition. Collect $100M"
+export const CHANCE_CARDS: Card[] = [
+  { text: "Advance to Start Journey (Collect $200M)", action: { type: 'advance', to: 0 } },
+  { text: "Advance to the last property", action: { type: 'advance', to: 39 } },
+  { text: "Advance to nearest Railroad. If unowned, you may buy it. If owned, pay owner twice the rental.", action: { type: 'advance', to: 'nearest_railroad', rentMultiplier: 2 } },
+  { text: "Advance to nearest Railroad. If unowned, you may buy it. If owned, pay owner twice the rental.", action: { type: 'advance', to: 'nearest_railroad', rentMultiplier: 2 } },
+  { text: "Advance to nearest Utility. If unowned, you may buy it. If owned, throw dice and pay owner 10x.", action: { type: 'advance', to: 'nearest_utility', rentMultiplier: 10 } },
+  { text: "Bank pays you dividend of $50M", action: { type: 'collect', amount: 50 } },
+  { text: "Get out of Prison Free", action: { type: 'get_out_of_jail' } },
+  { text: "Go back 3 spaces", action: { type: 'move_back', spaces: 3 } },
+  { text: "Go directly to Prison", action: { type: 'gotojail' } },
+  { text: "Make general repairs on all your properties: For each house pay $25M, for each hotel pay $100M", action: { type: 'repairs', house: 25, hotel: 100 } },
+  { text: "Pay poor tax of $15M", action: { type: 'pay', amount: 15 } },
+  { text: "Take a trip to the first Railroad. If you pass Start Journey, collect $200M", action: { type: 'advance', to: 5 } },
+  { text: "Take a walk to the first light blue property. Advance token.", action: { type: 'advance', to: 11 } },
+  { text: "You have been elected Chairman. Pay each player $50M", action: { type: 'pay_players', amount: 50 } },
+  { text: "Your building loan matures. Receive $150M", action: { type: 'collect', amount: 150 } },
+  { text: "You have won a competition. Collect $100M", action: { type: 'collect', amount: 100 } }
 ];
 
-export const CHEST_CARDS = [
-  "Advance to Start Journey (Collect $200M)",
-  "Bank error in your favor. Collect $200M",
-  "Doctor's fees. Pay $50M",
-  "From sale of stock you get $50M",
-  "Get out of Nordic Prison Free",
-  "Go directly to Nordic Prison",
-  "Grand Opera Night in Oslo. Collect $50M from every player for opening night seats",
-  "Holiday Fund matures. Receive $100M",
-  "Income tax refund. Collect $20M",
-  "It is your birthday. Collect $10M from every player",
-  "Life insurance matures. Collect $100M",
-  "Hospital Fees. Pay $50M",
-  "School fees. Pay $50M",
-  "Receive $25M consultancy fee",
-  "You are assessed for street repairs: Pay $40M per house and $115M per hotel",
-  "You have won second prize in a beauty contest. Collect $10M",
-  "You inherit $100M"
+export const CHEST_CARDS: Card[] = [
+  { text: "Advance to Start Journey (Collect $200M)", action: { type: 'advance', to: 0 } },
+  { text: "Bank error in your favor. Collect $200M", action: { type: 'collect', amount: 200 } },
+  { text: "Doctor's fees. Pay $50M", action: { type: 'pay', amount: 50 } },
+  { text: "From sale of stock you get $50M", action: { type: 'collect', amount: 50 } },
+  { text: "Get out of Prison Free", action: { type: 'get_out_of_jail' } },
+  { text: "Go directly to Prison", action: { type: 'gotojail' } },
+  { text: "Grand Opera Night. Collect $50M from every player", action: { type: 'collect_players', amount: 50 } },
+  { text: "Holiday Fund matures. Receive $100M", action: { type: 'collect', amount: 100 } },
+  { text: "Income tax refund. Collect $20M", action: { type: 'collect', amount: 20 } },
+  { text: "It is your birthday. Collect $10M from every player", action: { type: 'collect_players', amount: 10 } },
+  { text: "Life insurance matures. Collect $100M", action: { type: 'collect', amount: 100 } },
+  { text: "Hospital Fees. Pay $50M", action: { type: 'pay', amount: 50 } },
+  { text: "School fees. Pay $50M", action: { type: 'pay', amount: 50 } },
+  { text: "Receive $25M consultancy fee", action: { type: 'collect', amount: 25 } },
+  { text: "You are assessed for street repairs: Pay $40M per house and $115M per hotel", action: { type: 'repairs', house: 40, hotel: 115 } },
+  { text: "You have won second prize in a beauty contest. Collect $10M", action: { type: 'collect', amount: 10 } },
+  { text: "You inherit $100M", action: { type: 'collect', amount: 100 } }
 ];

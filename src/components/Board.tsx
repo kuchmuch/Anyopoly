@@ -100,11 +100,12 @@ export function Board({ gameState }: BoardProps) {
                   <motion.div
                     key={player.id}
                     layoutId={`player-${player.id}`}
-                    className="w-6 h-6 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    className="w-6 h-6 rounded-full border-2 border-white shadow-md flex items-center justify-center text-xs shrink-0"
                     style={{ backgroundColor: player.color }}
                     transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+                    title={player.name}
                   >
-                    {player.name.charAt(0)}
+                    {player.icon || player.name.charAt(0)}
                   </motion.div>
                 ))}
               </div>

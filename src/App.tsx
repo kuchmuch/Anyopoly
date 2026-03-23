@@ -24,8 +24,8 @@ export default function App() {
     setIsGenerating(true);
     setError('');
     try {
-      const { spaces: newSpaces, playerNames } = await generateThemeSpaces(themeInput);
-      startGame(themeInput, newSpaces, playerNames);
+      const { spaces: newSpaces, playerNames, playerIcons } = await generateThemeSpaces(themeInput);
+      startGame(themeInput, newSpaces, playerNames, playerIcons);
       setIsSetup(false);
     } catch (err) {
       console.error(err);
