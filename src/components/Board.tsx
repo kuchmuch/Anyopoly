@@ -72,7 +72,7 @@ export function Board({ gameState }: BoardProps) {
             {/* Content */}
             <div className="flex-1 flex flex-col items-center justify-center p-1 text-center font-semibold text-slate-800 relative z-0">
               {getSpaceIcon(space.type)}
-              <span className="line-clamp-2">{space.name}</span>
+              <span className="line-clamp-2" title={space.name}>{space.name}</span>
               {space.price && <span className="mt-1 text-slate-600">${space.price}M</span>}
             </div>
 
