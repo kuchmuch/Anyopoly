@@ -1,7 +1,7 @@
 import React from 'react';
-import { SPACES } from '../constants';
 import { GameState } from '../types';
 import { motion } from 'motion/react';
+import { ArrowRight, Lock, Coffee, Siren, HelpCircle, Archive, Train, Zap, Landmark } from 'lucide-react';
 
 interface BoardProps {
   gameState: GameState;
@@ -16,6 +16,21 @@ export function Board({ gameState }: BoardProps) {
     return { row: 1, col: 1 };
   };
 
+  const getSpaceIcon = (type: string) => {
+    switch (type) {
+      case 'go': return <ArrowRight className="w-5 h-5 text-red-500 mb-1" />;
+      case 'jail': return <Lock className="w-5 h-5 text-orange-500 mb-1" />;
+      case 'parking': return <Coffee className="w-5 h-5 text-blue-500 mb-1" />;
+      case 'gotojail': return <Siren className="w-5 h-5 text-red-600 mb-1" />;
+      case 'chance': return <HelpCircle className="w-5 h-5 text-purple-500 mb-1" />;
+      case 'chest': return <Archive className="w-5 h-5 text-amber-600 mb-1" />;
+      case 'railroad': return <Train className="w-5 h-5 text-slate-700 mb-1" />;
+      case 'utility': return <Zap className="w-5 h-5 text-amber-500 mb-1" />;
+      case 'tax': return <Landmark className="w-5 h-5 text-slate-600 mb-1" />;
+      default: return null;
+    }
+  };
+
   return (
     <div 
       className="relative w-full max-w-4xl aspect-square bg-green-50 border-4 border-slate-800 p-2 grid gap-1"
@@ -24,13 +39,13 @@ export function Board({ gameState }: BoardProps) {
       {/* Center Logo */}
       <div className="col-start-2 col-end-11 row-start-2 row-end-11 bg-green-100 flex items-center justify-center rounded-xl shadow-inner border-2 border-green-200">
         <div className="text-center transform -rotate-45">
-          <h1 className="text-6xl font-black text-red-600 tracking-tighter drop-shadow-md">TECHOPOLY</h1>
-          <p className="text-xl font-bold text-slate-700 mt-2">The Silicon Valley Edition</p>
+          <h1 className="text-5xl font-black text-red-600 tracking-tighter drop-shadow-md uppercase">{gameState.theme}</h1>
+          <p className="text-xl font-bold text-slate-700 mt-2">Monopoly Edition</p>
         </div>
       </div>
 
       {/* Spaces */}
-      {SPACES.map((space) => {
+      {gameState.spaces.map((space) => {
         const pos = getGridPosition(space.id);
         const propState = gameState.properties[space.id];
         const owner = propState?.ownerId !== undefined && propState.ownerId !== null ? gameState.players[propState.ownerId] : null;
@@ -56,6 +71,7 @@ export function Board({ gameState }: BoardProps) {
             
             {/* Content */}
             <div className="flex-1 flex flex-col items-center justify-center p-1 text-center font-semibold text-slate-800 relative z-0">
+              {getSpaceIcon(space.type)}
               <span className="line-clamp-2">{space.name}</span>
               {space.price && <span className="mt-1 text-slate-600">${space.price}M</span>}
             </div>

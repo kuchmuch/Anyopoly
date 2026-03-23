@@ -38,6 +38,8 @@ export interface PropertyState {
 }
 
 export interface GameState {
+  theme: string;
+  spaces: Space[];
   players: Player[];
   currentPlayerIndex: number;
   properties: Record<number, PropertyState>;

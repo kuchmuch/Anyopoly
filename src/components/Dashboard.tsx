@@ -1,6 +1,5 @@
 import React from 'react';
 import { GameState } from '../types';
-import { SPACES } from '../constants';
 import { motion } from 'motion/react';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Building, DollarSign, User } from 'lucide-react';
 
@@ -26,7 +25,7 @@ const DiceIcon = ({ value, className }: { value: number, className?: string }) =
 
 export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: DashboardProps) {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  const currentSpace = SPACES[currentPlayer.position];
+  const currentSpace = gameState.spaces[currentPlayer.position];
   const propState = gameState.properties[currentSpace.id];
 
   const canBuy = gameState.turnPhase === 'action' && 
@@ -45,7 +44,7 @@ export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: Da
       {/* Header */}
       <div className="bg-slate-900 text-white p-6 flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold tracking-tight">Techopoly Dashboard</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{gameState.theme} Dashboard</h2>
           <div className="flex gap-2">
             <DiceIcon value={gameState.dice[0]} className="w-8 h-8 text-white" />
             <DiceIcon value={gameState.dice[1]} className="w-8 h-8 text-white" />
@@ -102,7 +101,7 @@ export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: Da
             disabled={!canUpgrade}
             className="py-3 rounded-xl font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-200"
           >
-            Invest (Upgrade)
+            Upgrade / Build
           </button>
 
           <button
@@ -125,7 +124,7 @@ export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: Da
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.color }} />
                 <span className="font-semibold text-slate-700">{p.name}</span>
                 {p.bankrupt && <span className="text-xs text-red-500 font-bold uppercase">Bankrupt</span>}
-                {p.inJail && <span className="text-xs text-orange-500 font-bold uppercase">Audited</span>}
+                {p.inJail && <span className="text-xs text-orange-500 font-bold uppercase">In Jail</span>}
               </div>
               <span className="font-mono font-bold text-slate-900">${p.balance}M</span>
             </div>

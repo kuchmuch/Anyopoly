@@ -8,13 +8,15 @@ const INITIAL_PLAYERS: Player[] = [
 ];
 
 const INITIAL_STATE: GameState = {
+  theme: 'Nordic Countries',
+  spaces: SPACES,
   players: INITIAL_PLAYERS,
   currentPlayerIndex: 0,
   properties: {},
   dice: [1, 1],
   doublesCount: 0,
   turnPhase: 'roll',
-  message: 'Welcome to Techopoly! Player 1, roll the dice.',
+  message: 'Welcome to Nordic Countries Monopoly! Player 1, roll the dice.',
   chanceCards: [...CHANCE_CARDS].sort(() => Math.random() - 0.5),
   chestCards: [...CHEST_CARDS].sort(() => Math.random() - 0.5),
 };
@@ -46,20 +48,20 @@ export function useGame() {
 
       if (inJail) {
         if (isDouble) {
-          message += 'Rolled doubles! Escaped Regulatory Audit. ';
+          message += `Rolled doubles! Escaped ${prev.spaces[10].name}. `;
           inJail = false;
           jailTurns = 0;
           newPosition = (newPosition + total) % 40;
         } else {
           jailTurns++;
           if (jailTurns >= 3) {
-            message += 'Paid $50M fine to escape Regulatory Audit. ';
+            message += `Paid $50M fine to escape ${prev.spaces[10].name}. `;
             newBalance -= 50;
             inJail = false;
             jailTurns = 0;
             newPosition = (newPosition + total) % 40;
           } else {
-            message += 'Still in Regulatory Audit. ';
+            message += `Still in ${prev.spaces[10].name}. `;
             return {
               ...prev,
               dice: [d1, d2],
@@ -73,7 +75,7 @@ export function useGame() {
         if (isDouble) {
           doublesCount++;
           if (doublesCount === 3) {
-            message += 'Three doubles! Go to Regulatory Audit. ';
+            message += `Three doubles! Go to ${prev.spaces[10].name}. `;
             return {
               ...prev,
               dice: [d1, d2],
@@ -89,12 +91,12 @@ export function useGame() {
         
         newPosition = (newPosition + total) % 40;
         if (newPosition < currentPlayer.position) {
-          message += 'Passed Funding Round! Collect $200M. ';
+          message += `Passed ${prev.spaces[0].name}! Collect $200M. `;
           newBalance += 200;
         }
       }
 
-      const space = SPACES[newPosition];
+      const space = prev.spaces[newPosition];
       message += `Landed on ${space.name}. `;
 
       let nextPhase: 'roll' | 'action' | 'end' = (isDouble && !wasInJail) ? 'roll' : 'end';
@@ -111,10 +113,10 @@ export function useGame() {
             rent = space.rent![propState.houses];
             // Check monopoly for double base rent if 0 houses (simplified: just use base rent for now)
           } else if (space.type === 'railroad') {
-            const rrCount = Object.values(updatedProperties).filter((p: any) => p.ownerId === propState.ownerId && SPACES[p.spaceId].type === 'railroad').length;
+            const rrCount = Object.values(updatedProperties).filter((p: any) => p.ownerId === propState.ownerId && prev.spaces[p.spaceId].type === 'railroad').length;
             rent = space.rent![rrCount - 1];
           } else if (space.type === 'utility') {
-            const utilCount = Object.values(updatedProperties).filter((p: any) => p.ownerId === propState.ownerId && SPACES[p.spaceId].type === 'utility').length;
+            const utilCount = Object.values(updatedProperties).filter((p: any) => p.ownerId === propState.ownerId && prev.spaces[p.spaceId].type === 'utility').length;
             rent = utilCount === 2 ? total * 10 : total * 4;
           }
           
@@ -130,7 +132,7 @@ export function useGame() {
         message += `Paid $${space.price}M tax. `;
         newBalance -= space.price!;
       } else if (space.type === 'gotojail') {
-        message += `Go directly to Regulatory Audit! `;
+        message += `Go directly to ${prev.spaces[10].name}! `;
         newPosition = 10;
         inJail = true;
         nextPhase = 'end';
@@ -139,10 +141,10 @@ export function useGame() {
         // Implementing full cards is complex, let's just do a simple random money effect for now
         const amount = Math.floor(Math.random() * 100) - 50;
         if (amount > 0) {
-           message += `Market is up! Gained $${amount}M. `;
+           message += `Good fortune! Gained $${amount}M. `;
            newBalance += amount;
         } else {
-           message += `Market is down! Lost $${Math.abs(amount)}M. `;
+           message += `Bad luck! Lost $${Math.abs(amount)}M. `;
            newBalance += amount;
         }
       }
@@ -180,7 +182,7 @@ export function useGame() {
   const buyProperty = useCallback(() => {
     setState((prev) => {
       const currentPlayer = prev.players[prev.currentPlayerIndex];
-      const space = SPACES[currentPlayer.position];
+      const space = prev.spaces[currentPlayer.position];
       
       if (currentPlayer.balance >= space.price!) {
         return {
@@ -201,7 +203,7 @@ export function useGame() {
   const upgradeProperty = useCallback(() => {
     setState((prev) => {
       const currentPlayer = prev.players[prev.currentPlayerIndex];
-      const space = SPACES[currentPlayer.position];
+      const space = prev.spaces[currentPlayer.position];
       const propState = prev.properties[currentPlayer.position];
       
       if (propState && propState.ownerId === currentPlayer.id && propState.houses < 5 && currentPlayer.balance >= space.houseCost!) {
@@ -213,7 +215,7 @@ export function useGame() {
             [currentPlayer.position]: { ...propState, houses: propState.houses + 1 }
           },
           turnPhase: prev.doublesCount > 0 ? 'roll' : 'end',
-          message: `${currentPlayer.name} invested in ${space.name} for $${space.houseCost}M.`
+          message: `${currentPlayer.name} upgraded ${space.name} for $${space.houseCost}M.`
         };
       }
       return prev;
@@ -248,5 +250,14 @@ export function useGame() {
     });
   }, []);
 
-  return { state, rollDice, buyProperty, upgradeProperty, endTurn };
+  const startGame = useCallback((theme: string, spaces: typeof SPACES) => {
+    setState({
+      ...INITIAL_STATE,
+      theme,
+      spaces,
+      message: `Welcome to ${theme} Monopoly! Player 1, roll the dice.`,
+    });
+  }, []);
+
+  return { state, rollDice, buyProperty, upgradeProperty, endTurn, startGame };
 }
