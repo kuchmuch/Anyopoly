@@ -3,8 +3,8 @@ import { GameState, Player, PropertyState } from './types';
 import { SPACES, CHANCE_CARDS, CHEST_CARDS } from './constants';
 
 const INITIAL_PLAYERS: Player[] = [
-  { id: 0, name: 'Founder 1', color: '#ef4444', balance: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false },
-  { id: 1, name: 'Founder 2', color: '#3b82f6', balance: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false },
+  { id: 0, name: 'Viking', color: '#ef4444', balance: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false },
+  { id: 1, name: 'Explorer', color: '#3b82f6', balance: 1500, position: 0, inJail: false, jailTurns: 0, bankrupt: false },
 ];
 
 const INITIAL_STATE: GameState = {
@@ -16,7 +16,7 @@ const INITIAL_STATE: GameState = {
   dice: [1, 1],
   doublesCount: 0,
   turnPhase: 'roll',
-  message: 'Welcome to Nordic Countries Monopoly! Player 1, roll the dice.',
+  message: 'Welcome to Nordic Countries Monopoly! Viking, roll the dice.',
   chanceCards: [...CHANCE_CARDS].sort(() => Math.random() - 0.5),
   chestCards: [...CHEST_CARDS].sort(() => Math.random() - 0.5),
 };
@@ -250,12 +250,19 @@ export function useGame() {
     });
   }, []);
 
-  const startGame = useCallback((theme: string, spaces: typeof SPACES) => {
+  const startGame = useCallback((theme: string, spaces: typeof SPACES, playerNames?: string[]) => {
+    const newPlayers = [...INITIAL_PLAYERS];
+    if (playerNames && playerNames.length >= 2) {
+      newPlayers[0] = { ...newPlayers[0], name: playerNames[0] };
+      newPlayers[1] = { ...newPlayers[1], name: playerNames[1] };
+    }
+
     setState({
       ...INITIAL_STATE,
       theme,
       spaces,
-      message: `Welcome to ${theme} Monopoly! Player 1, roll the dice.`,
+      players: newPlayers,
+      message: `Welcome to ${theme} Monopoly! ${newPlayers[0].name}, roll the dice.`,
     });
   }, []);
 

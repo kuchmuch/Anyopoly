@@ -3,10 +3,12 @@ import { Space } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-export async function generateThemeSpaces(theme: string): Promise<Space[]> {
+export async function generateThemeSpaces(theme: string): Promise<{ spaces: Space[], playerNames: string[] }> {
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Generate a custom Monopoly board with 40 spaces based on the theme: "${theme}".
+    
+    Also generate 2 creative player titles/names that fit the theme perfectly (e.g., for Space: "Astronaut", "Alien").
     
     The board must have exactly 40 spaces.
     The indices must match standard Monopoly:
@@ -33,41 +35,57 @@ export async function generateThemeSpaces(theme: string): Promise<Space[]> {
     config: {
       responseMimeType: "application/json",
       responseSchema: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            id: { type: Type.INTEGER, description: "The space index (0-39)" },
-            name: { type: Type.STRING, description: "The name of the space" },
-            type: { 
-              type: Type.STRING, 
-              description: "Must be one of: 'property', 'go', 'chance', 'chest', 'tax', 'jail', 'parking', 'gotojail', 'railroad', 'utility'" 
-            },
-            color: { type: Type.STRING, description: "Hex color code for properties" },
-            price: { type: Type.INTEGER, description: "Purchase price or tax amount" },
-            rent: { 
-              type: Type.ARRAY, 
-              items: { type: Type.INTEGER },
-              description: "Array of 6 rent values for properties, or 4 for railroads" 
-            },
-            houseCost: { type: Type.INTEGER, description: "Cost per house/upgrade for properties" }
+        type: Type.OBJECT,
+        properties: {
+          playerNames: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Array of 2 player titles/names fitting the theme"
           },
-          required: ["id", "name", "type"]
-        }
+          spaces: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                id: { type: Type.INTEGER, description: "The space index (0-39)" },
+                name: { type: Type.STRING, description: "The name of the space" },
+                type: { 
+                  type: Type.STRING, 
+                  description: "Must be one of: 'property', 'go', 'chance', 'chest', 'tax', 'jail', 'parking', 'gotojail', 'railroad', 'utility'" 
+                },
+                color: { type: Type.STRING, description: "Hex color code for properties" },
+                price: { type: Type.INTEGER, description: "Purchase price or tax amount" },
+                rent: { 
+                  type: Type.ARRAY, 
+                  items: { type: Type.INTEGER },
+                  description: "Array of 6 rent values for properties, or 4 for railroads" 
+                },
+                houseCost: { type: Type.INTEGER, description: "Cost per house/upgrade for properties" }
+              },
+              required: ["id", "name", "type"]
+            }
+          }
+        },
+        required: ["playerNames", "spaces"]
       }
     }
   });
 
-  const jsonStr = response.text?.trim() || "[]";
-  const spaces: Space[] = JSON.parse(jsonStr);
+  const jsonStr = response.text?.trim() || "{}";
+  const data = JSON.parse(jsonStr);
+  const spaces: Space[] = data.spaces || [];
+  const playerNames: string[] = data.playerNames || ["Player 1", "Player 2"];
   
   // Ensure exactly 40 spaces and correct IDs
   if (spaces.length !== 40) {
     throw new Error("Generated board does not have exactly 40 spaces.");
   }
   
-  return spaces.map((space, index) => ({
-    ...space,
-    id: index // Enforce correct IDs
-  }));
+  return {
+    spaces: spaces.map((space, index) => ({
+      ...space,
+      id: index // Enforce correct IDs
+    })),
+    playerNames
+  };
 }
