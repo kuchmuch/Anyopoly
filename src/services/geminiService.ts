@@ -97,3 +97,33 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
     playerIcons
   };
 }
+
+export async function generateThemeImage(theme: string): Promise<string | undefined> {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [
+          {
+            text: `A clean, minimalist vector-style illustration representing the theme "${theme}". It should be suitable for the center of a board game. White background.`,
+          },
+        ],
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: "1:1",
+          imageSize: "1K"
+        }
+      },
+    });
+
+    for (const part of response.candidates?.[0]?.content?.parts || []) {
+      if (part.inlineData) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to generate theme image:", err);
+  }
+  return undefined;
+}

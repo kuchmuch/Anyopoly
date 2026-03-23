@@ -61,7 +61,13 @@ export function Board({ gameState }: BoardProps) {
           <span className="text-amber-800 font-black text-[10px] sm:text-sm mt-1 sm:mt-2 uppercase tracking-widest text-center leading-tight">Community<br/>Chest</span>
         </div>
 
-        <div className="text-center transform -rotate-45 z-10">
+        <div className="text-center transform -rotate-45 z-10 flex flex-col items-center">
+          <img 
+            src={gameState.themeImage || `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(gameState.theme)}&backgroundColor=transparent`}
+            alt={`${gameState.theme} illustration`}
+            className={`w-16 h-16 sm:w-24 sm:h-24 mb-2 sm:mb-4 drop-shadow-md ${gameState.themeImage ? 'rounded-xl object-cover border-2 border-white' : ''}`}
+            referrerPolicy="no-referrer"
+          />
           <h1 className="text-3xl sm:text-5xl font-black text-red-600 tracking-tighter drop-shadow-md uppercase">{gameState.theme}</h1>
           <p className="text-sm sm:text-xl font-bold text-slate-700 mt-1 sm:mt-2">Anyopoly - made by you</p>
         </div>
@@ -74,14 +80,47 @@ export function Board({ gameState }: BoardProps) {
         const owner = propState?.ownerId !== undefined && propState.ownerId !== null ? gameState.players[propState.ownerId] : null;
         
         const playersOnSpace = gameState.players.filter(p => p.position === space.id && !p.bankrupt);
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        const isCurrentPlayerSpace = space.id === currentPlayer.position;
+
+        let tooltipPosClass = "";
+        let arrowClass = "hidden";
+
+        if (space.id === 0) {
+          tooltipPosClass = "bottom-full mb-2 right-0";
+        } else if (space.id === 10) {
+          tooltipPosClass = "bottom-full mb-2 left-0";
+        } else if (space.id === 20) {
+          tooltipPosClass = "top-full mt-2 left-0";
+        } else if (space.id === 30) {
+          tooltipPosClass = "top-full mt-2 right-0";
+        } else if (pos.row === 11) {
+          tooltipPosClass = "bottom-full mb-2 left-1/2 -translate-x-1/2";
+          arrowClass = "top-full left-1/2 -translate-x-1/2 border-t-slate-900 border-l-transparent border-r-transparent border-b-transparent";
+        } else if (pos.row === 1) {
+          tooltipPosClass = "top-full mt-2 left-1/2 -translate-x-1/2";
+          arrowClass = "bottom-full left-1/2 -translate-x-1/2 border-b-slate-900 border-l-transparent border-r-transparent border-t-transparent";
+        } else if (pos.col === 1) {
+          tooltipPosClass = "left-full ml-2 top-1/2 -translate-y-1/2";
+          arrowClass = "right-full top-1/2 -translate-y-1/2 border-r-slate-900 border-t-transparent border-b-transparent border-l-transparent";
+        } else if (pos.col === 11) {
+          tooltipPosClass = "right-full mr-2 top-1/2 -translate-y-1/2";
+          arrowClass = "left-full top-1/2 -translate-y-1/2 border-l-slate-900 border-t-transparent border-b-transparent border-r-transparent";
+        }
 
         return (
           <div
             key={space.id}
-            className="relative border border-slate-400 bg-white flex flex-col text-[10px] leading-tight overflow-hidden"
+            className={`group relative border bg-white flex flex-col text-[10px] leading-tight transition-all duration-500 hover:z-50 ${
+              isCurrentPlayerSpace ? 'z-20' : 'border-slate-400 z-0'
+            }`}
             style={{
               gridColumn: pos.col,
               gridRow: pos.row,
+              ...(isCurrentPlayerSpace ? {
+                borderColor: currentPlayer.color,
+                boxShadow: `0 0 20px 4px ${currentPlayer.color}60, inset 0 0 0 2px ${currentPlayer.color}`,
+              } : {})
             }}
           >
             {/* Color Bar */}
@@ -133,6 +172,34 @@ export function Board({ gameState }: BoardProps) {
                 ))}
               </div>
             )}
+
+            {/* Tooltip */}
+            <div className={`absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[100] bg-slate-900 text-white p-3 rounded-lg shadow-2xl w-48 text-xs ${tooltipPosClass}`}>
+              <div className="font-bold text-sm mb-1">{space.name}</div>
+              <div className="text-slate-300 capitalize mb-2">{space.type}</div>
+              
+              {space.price && (
+                <div className="flex justify-between border-t border-slate-700 pt-2 mt-2">
+                  <span className="text-slate-400">Price:</span> 
+                  <span className="font-semibold">${space.price}M</span>
+                </div>
+              )}
+              {space.rent && space.rent.length > 0 && (
+                <div className="flex justify-between mt-1">
+                  <span className="text-slate-400">Base Rent:</span> 
+                  <span className="font-semibold">${space.rent[0]}M</span>
+                </div>
+              )}
+              {space.houseCost && (
+                <div className="flex justify-between mt-1">
+                  <span className="text-slate-400">House Cost:</span> 
+                  <span className="font-semibold">${space.houseCost}M</span>
+                </div>
+              )}
+              
+              {/* Tooltip Arrow */}
+              <div className={`absolute border-4 ${arrowClass}`} />
+            </div>
           </div>
         );
       })}

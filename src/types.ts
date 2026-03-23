@@ -57,6 +57,7 @@ export interface PropertyState {
 
 export interface GameState {
   theme: string;
+  themeImage?: string;
   spaces: Space[];
   players: Player[];
   currentPlayerIndex: number;

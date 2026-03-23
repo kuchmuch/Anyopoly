@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Board } from './components/Board';
 import { Dashboard } from './components/Dashboard';
 import { useGame } from './useGame';
-import { generateThemeSpaces } from './services/geminiService';
+import { generateThemeSpaces, generateThemeImage } from './services/geminiService';
 import { SPACES } from './constants';
 import { Loader2 } from 'lucide-react';
 
@@ -14,18 +14,23 @@ export default function App() {
   const [error, setError] = useState('');
 
   const handleStartGame = async () => {
-    if (!themeInput.trim()) {
-      // Start with default theme
-      startGame('Nordic Countries', SPACES);
-      setIsSetup(false);
-      return;
-    }
-
     setIsGenerating(true);
     setError('');
+
     try {
-      const { spaces: newSpaces, playerNames, playerIcons } = await generateThemeSpaces(themeInput);
-      startGame(themeInput, newSpaces, playerNames, playerIcons);
+      if (!themeInput.trim()) {
+        // Start with default theme, but generate a picture for it
+        const themeImage = await generateThemeImage('Nordic Countries');
+        startGame('Nordic Countries', SPACES, undefined, undefined, themeImage);
+        setIsSetup(false);
+        return;
+      }
+
+      const [{ spaces: newSpaces, playerNames, playerIcons }, themeImage] = await Promise.all([
+        generateThemeSpaces(themeInput),
+        generateThemeImage(themeInput)
+      ]);
+      startGame(themeInput, newSpaces, playerNames, playerIcons, themeImage);
       setIsSetup(false);
     } catch (err) {
       console.error(err);

@@ -340,7 +340,7 @@ export function useGame() {
     });
   }, []);
 
-  const startGame = useCallback((theme: string, spaces: typeof SPACES, playerNames?: string[], playerIcons?: string[]) => {
+  const startGame = useCallback((theme: string, spaces: typeof SPACES, playerNames?: string[], playerIcons?: string[], themeImage?: string) => {
     const newPlayers = [...INITIAL_PLAYERS];
     if (playerNames && playerNames.length >= 2) {
       newPlayers[0] = { ...newPlayers[0], name: playerNames[0] };
@@ -354,6 +354,7 @@ export function useGame() {
     setState({
       ...INITIAL_STATE,
       theme,
+      themeImage,
       spaces,
       players: newPlayers,
       message: `Welcome to ${theme} Monopoly! ${newPlayers[0].name}, roll the dice.`,
