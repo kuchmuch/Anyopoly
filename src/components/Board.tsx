@@ -36,11 +36,34 @@ export function Board({ gameState }: BoardProps) {
       className="relative w-full max-w-4xl aspect-square bg-green-50 border-4 border-slate-800 p-2 grid gap-1"
       style={{ gridTemplateColumns: 'repeat(11, minmax(0, 1fr))', gridTemplateRows: 'repeat(11, minmax(0, 1fr))' }}
     >
-      {/* Center Logo */}
-      <div className="col-start-2 col-end-11 row-start-2 row-end-11 bg-green-100 flex items-center justify-center rounded-xl shadow-inner border-2 border-green-200">
-        <div className="text-center transform -rotate-45">
-          <h1 className="text-5xl font-black text-red-600 tracking-tighter drop-shadow-md uppercase">{gameState.theme}</h1>
-          <p className="text-xl font-bold text-slate-700 mt-2">Monopoly Edition</p>
+      {/* Center Logo & Decks */}
+      <div className="col-start-2 col-end-11 row-start-2 row-end-11 bg-green-100 relative flex items-center justify-center rounded-xl shadow-inner border-2 border-green-200 overflow-hidden">
+        
+        {/* Chance Deck */}
+        <div className="absolute top-8 left-8 sm:top-12 sm:left-12 transform -rotate-45 flex flex-col items-center">
+          <div className="w-20 h-12 sm:w-28 sm:h-16 bg-purple-500 rounded-md border-2 border-purple-700 shadow-[4px_4px_0px_rgba(0,0,0,0.2)] flex items-center justify-center relative">
+            <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white opacity-90" />
+            <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-slate-800 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full border-2 border-white shadow-sm">
+              {gameState.chanceCards.length}
+            </div>
+          </div>
+          <span className="text-purple-800 font-black text-[10px] sm:text-sm mt-1 sm:mt-2 uppercase tracking-widest">Chance</span>
+        </div>
+
+        {/* Community Chest Deck */}
+        <div className="absolute bottom-8 right-8 sm:bottom-12 sm:right-12 transform -rotate-45 flex flex-col items-center">
+          <div className="w-20 h-12 sm:w-28 sm:h-16 bg-amber-500 rounded-md border-2 border-amber-700 shadow-[4px_4px_0px_rgba(0,0,0,0.2)] flex items-center justify-center relative">
+            <Archive className="w-6 h-6 sm:w-8 sm:h-8 text-white opacity-90" />
+            <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-slate-800 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full border-2 border-white shadow-sm">
+              {gameState.chestCards.length}
+            </div>
+          </div>
+          <span className="text-amber-800 font-black text-[10px] sm:text-sm mt-1 sm:mt-2 uppercase tracking-widest text-center leading-tight">Community<br/>Chest</span>
+        </div>
+
+        <div className="text-center transform -rotate-45 z-10">
+          <h1 className="text-3xl sm:text-5xl font-black text-red-600 tracking-tighter drop-shadow-md uppercase">{gameState.theme}</h1>
+          <p className="text-sm sm:text-xl font-bold text-slate-700 mt-1 sm:mt-2">Anyopoly - made by you</p>
         </div>
       </div>
 

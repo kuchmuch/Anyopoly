@@ -44,7 +44,7 @@ export function Dashboard({ gameState, onRoll, onBuy, onUpgrade, onEndTurn }: Da
       {/* Header */}
       <div className="bg-slate-900 text-white p-6 flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold tracking-tight">{gameState.theme} Dashboard</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{gameState.theme} Anyopoly</h2>
           <div className="flex gap-2">
             <DiceIcon value={gameState.dice[0]} className="w-8 h-8 text-white" />
             <DiceIcon value={gameState.dice[1]} className="w-8 h-8 text-white" />

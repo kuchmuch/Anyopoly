@@ -39,7 +39,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-8 font-sans">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-200 text-center">
-          <h1 className="text-4xl font-black text-slate-800 mb-2">Monopoly</h1>
+          <h1 className="text-4xl font-black text-slate-800 mb-2">Anyopoly</h1>
           <p className="text-slate-500 mb-8">Choose a theme for your game!</p>
           
           <div className="flex flex-col gap-4">
