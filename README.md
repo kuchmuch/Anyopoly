@@ -1,20 +1,26 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Anyopoly
 
-# Run and deploy your AI Studio app
+Anyopoly is an AI-powered custom Monopoly board generator. You can enter any theme (e.g., "Pirates", "Space", "Medieval") and the game will generate a fully playable, customized Monopoly board complete with:
 
-This contains everything you need to run your app locally.
+- Themed property names and colors
+- Custom player names and emoji icons
+- A unique, AI-generated centerpiece illustration for the board
 
-View your app in AI Studio: https://ai.studio/apps/330f6d07-b824-4e4d-9f3b-fd89eb919e2e
+## How to Play
 
-## Run Locally
+1. Enter a theme in the starting screen, or leave it blank to play the default "Nordic Countries" theme.
+2. Click "Generate Theme & Start".
+3. Roll the dice, buy properties, and try not to go bankrupt!
 
-**Prerequisites:**  Node.js
+## Technologies Used
 
+- React
+- Tailwind CSS
+- Google Gemini API (for generating board data and centerpiece images)
+- Vite
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Setup
+
+1. Install dependencies: \`npm install\`
+2. Set up your environment variables by copying \`.env.example\` to \`.env\` and adding your Gemini API key.
+3. Start the development server: \`npm run dev\`
