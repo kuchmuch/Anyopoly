@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameState } from '../types';
 import { motion } from 'motion/react';
-import { ArrowRight, Lock, Coffee, Siren, HelpCircle, Archive, Train, Zap, Landmark } from 'lucide-react';
+import { ArrowRight, Lock, Coffee, Siren, HelpCircle, Archive, Train, Zap, Landmark, Info, X } from 'lucide-react';
 
 interface BoardProps {
   gameState: GameState;
 }
 
 export function Board({ gameState }: BoardProps) {
+  const [isFlipped, setIsFlipped] = useState(false);
+
   const getGridPosition = (id: number) => {
     if (id >= 0 && id <= 10) return { row: 11, col: 11 - id };
     if (id >= 11 && id <= 20) return { col: 1, row: 21 - id };
@@ -32,12 +34,29 @@ export function Board({ gameState }: BoardProps) {
   };
 
   return (
-    <div 
-      className="relative w-full max-w-4xl aspect-square bg-green-50 border-4 border-slate-800 p-2 grid gap-1"
-      style={{ gridTemplateColumns: 'repeat(11, minmax(0, 1fr))', gridTemplateRows: 'repeat(11, minmax(0, 1fr))' }}
-    >
-      {/* Center Logo & Decks */}
-      <div className="col-start-2 col-end-11 row-start-2 row-end-11 bg-green-100 relative flex items-center justify-center rounded-xl shadow-inner border-2 border-green-200 overflow-hidden">
+    <div className="relative w-full max-w-4xl aspect-square perspective-[2000px]">
+      <motion.div 
+        className="w-full h-full relative"
+        style={{ transformStyle: 'preserve-3d' }}
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
+      >
+        {/* Front of the board */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-green-50 border-4 border-slate-800 p-2 grid gap-1"
+          style={{ gridTemplateColumns: 'repeat(11, minmax(0, 1fr))', gridTemplateRows: 'repeat(11, minmax(0, 1fr))', backfaceVisibility: 'hidden' }}
+        >
+          {/* Center Logo & Decks */}
+          <div className="col-start-2 col-end-11 row-start-2 row-end-11 bg-green-100 relative flex items-center justify-center rounded-xl shadow-inner border-2 border-green-200 overflow-hidden">
+            
+            {/* Explain the Board Button */}
+            <button 
+              onClick={() => setIsFlipped(true)}
+              className="absolute top-4 right-4 z-20 bg-white border-2 border-slate-300 shadow-md rounded-lg px-3 py-2 flex items-center gap-2 hover:bg-slate-50 transition-colors group"
+            >
+              <Info className="w-4 h-4 text-slate-500 group-hover:text-indigo-600 transition-colors" />
+              <span className="text-xs font-bold text-slate-600 group-hover:text-indigo-700 uppercase tracking-wider hidden sm:inline">Explain Board</span>
+            </button>
         
         {/* Chance Deck */}
         <div className="absolute top-8 left-8 sm:top-12 sm:left-12 transform -rotate-45 flex flex-col items-center">
@@ -203,6 +222,52 @@ export function Board({ gameState }: BoardProps) {
           </div>
         );
       })}
+        </div>
+
+        {/* Back of the board (Explanations) */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-slate-800 rounded-xl border-4 border-slate-700 p-6 sm:p-10 flex flex-col shadow-2xl"
+          style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}
+        >
+          <div className="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
+            <div>
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">Board Explanations</h2>
+              <p className="text-slate-400 mt-1">Discover how each space connects to the theme.</p>
+            </div>
+            <button 
+              onClick={() => setIsFlipped(false)} 
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 font-bold flex items-center gap-2 transition-colors shadow-lg"
+            >
+              <X className="w-5 h-5" />
+              <span className="hidden sm:inline">Back to Game</span>
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto pr-2 sm:pr-4 space-y-4 custom-scrollbar">
+            {gameState.spaces.map(space => (
+              <div key={space.id} className="bg-slate-700/50 rounded-xl p-4 sm:p-5 flex gap-4 sm:gap-6 border border-slate-600/50 hover:bg-slate-700 transition-colors">
+                <div 
+                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex-shrink-0 flex items-center justify-center font-black text-white shadow-inner text-xl sm:text-2xl border-2 border-white/20" 
+                  style={{ backgroundColor: space.color || '#475569' }}
+                >
+                  {space.id}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="text-lg sm:text-xl font-bold text-white">{space.name}</h3>
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-600 text-slate-300">
+                      {space.type}
+                    </span>
+                  </div>
+                  <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    {space.description || "A classic space adapted for this theme."}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

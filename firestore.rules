@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: featured_boards
+    // Document ID: auto-generated
+    // Fields:
+    //   - theme: string (required) - The theme name of the board
+    //   - imageUrl: string (optional) - URL of the generated theme image
+    //   - boardData: string (required) - JSON stringified board data
+    //   - createdAt: timestamp (required) - When the board was saved
+    //   - createdBy: string (required) - UID of the admin who saved it
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    // Check if the user is authenticated
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+    
+    // Check if user is the admin
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == "uri@hastemedia.com" && request.auth.token.email_verified == true;
+    }
+    
+    // Validate required fields exist
+    function hasRequiredFields(fields) {
+       return request.resource.data.keys().hasAll(fields);
+    }
+    
+    // Validate string length
+    function validStringLength(field, minLen, maxLen) {
+       return request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen;
+    }
+
+    // Domain Validators
+    function isValidFeaturedBoard(data) {
+      return hasRequiredFields(['theme', 'boardData', 'createdAt', 'createdBy']) &&
+             data.theme is string && data.theme.size() > 0 && data.theme.size() < 100 &&
+             data.boardData is string && data.boardData.size() > 0 && data.boardData.size() < 1000000 &&
+             (!('imageUrl' in data) || (data.imageUrl == null) || (data.imageUrl is string && data.imageUrl.size() < 1000000)) &&
+             data.createdAt is timestamp &&
+             data.createdBy is string && data.createdBy == request.auth.uid;
+    }
+
+    match /featured_boards/{boardId} {
+      // Anyone can read featured boards
+      allow read: if true;
+      
+      // Only admin can create, update, or delete
+      allow create: if isAdmin() && isValidFeaturedBoard(request.resource.data);
+      allow update: if isAdmin() && isValidFeaturedBoard(request.resource.data) && request.resource.data.createdBy == resource.data.createdBy;
+      allow delete: if isAdmin();
+    }
+  }
+}

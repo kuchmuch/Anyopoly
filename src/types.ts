@@ -18,6 +18,7 @@ export interface Space {
   price?: number;
   rent?: number[]; // [base, 1 house, 2 houses, 3 houses, 4 houses, hotel]
   houseCost?: number;
+  description?: string;
 }
 
 export type CardAction = 

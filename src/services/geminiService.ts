@@ -3,13 +3,34 @@ import { Space } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-export async function generateThemeSpaces(theme: string): Promise<{ spaces: Space[], playerNames: string[], playerIcons: string[] }> {
+export async function expandTheme(theme: string): Promise<string> {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `The user wants a Monopoly board themed around '${theme}'. Write a rich, 3-sentence description expanding this into a broad world with locations, characters, and items. This will be used as inspiration to generate the board spaces.`,
+    });
+    return response.text?.trim() || theme;
+  } catch (err) {
+    console.error("Failed to expand theme:", err);
+    return theme;
+  }
+}
+
+export async function generateThemeSpaces(theme: string, expandedTheme?: string): Promise<{ spaces: Space[], playerNames: string[], playerIcons: string[] }> {
+  const themeContext = expandedTheme 
+    ? `Theme: "${theme}"\n\nExpanded World Inspiration:\n${expandedTheme}`
+    : `Theme: "${theme}"`;
+
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `Generate a custom Monopoly board with 40 spaces based on the theme: "${theme}".
+    contents: `Generate a custom Monopoly board with 40 spaces based on the following theme context:
+    
+    ${themeContext}
     
     Also generate 2 creative player titles/names that fit the theme perfectly (e.g., for Space: "Astronaut", "Alien").
     Also generate 2 distinct emoji icons that match those player titles (e.g., "🧑‍🚀", "👽").
+    
+    For each space, provide a max 2-line description explaining its origin and connection to the theme.
     
     The board must have exactly 40 spaces.
     The indices must match standard Monopoly:
@@ -66,9 +87,10 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
                   items: { type: Type.INTEGER },
                   description: "Array of 6 rent values for properties, or 4 for railroads" 
                 },
-                houseCost: { type: Type.INTEGER, description: "Cost per house/upgrade for properties" }
+                houseCost: { type: Type.INTEGER, description: "Cost per house/upgrade for properties" },
+                description: { type: Type.STRING, description: "Max 2-line explanation of the space's connection to the theme" }
               },
-              required: ["id", "name", "type"]
+              required: ["id", "name", "type", "description"]
             }
           }
         },
@@ -98,6 +120,36 @@ export async function generateThemeSpaces(theme: string): Promise<{ spaces: Spac
   };
 }
 
+export const compressImage = (base64Str: string, maxWidth = 512, maxHeight = 512): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.6));
+    };
+    img.onerror = () => resolve(base64Str); // Fallback if image loading fails
+  });
+};
+
 export async function generateThemeImage(theme: string): Promise<string | undefined> {
   try {
     const response = await ai.models.generateContent({
@@ -119,7 +171,8 @@ export async function generateThemeImage(theme: string): Promise<string | undefi
 
     for (const part of response.candidates?.[0]?.content?.parts || []) {
       if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
+        const originalBase64 = `data:image/png;base64,${part.inlineData.data}`;
+        return await compressImage(originalBase64);
       }
     }
   } catch (err) {
