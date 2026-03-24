@@ -6,6 +6,8 @@ Anyopoly is an AI-powered custom Monopoly board generator. You can enter any the
 - Custom player names and emoji icons
 - A unique, AI-generated centerpiece illustration for the board
 
+Created with Gemini AI Studio
+
 ## How to Play
 
 1. Enter a theme in the starting screen, or leave it blank to play the default "Nordic Countries" theme.
